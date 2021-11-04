@@ -1,5 +1,6 @@
 import config.ApplicationProperties;
 import dem.DemController;
+import dem.DemInfo;
 import dem.DemService;
 import org.xml.sax.SAXException;
 import sun.SunApiController;
@@ -7,6 +8,7 @@ import sun.SunInfo;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class main {
 
@@ -29,7 +31,9 @@ public class main {
         * */
         
         dem.run();
-
+        ArrayList<ArrayList<DemInfo>> arr = dem.getDEM();
+        System.out.println(arr.get(0).get(1).getX()); // 테스트 코드
+    
         SunInfo si = sc.getSunInfoXml("20150101", "12659", "3734", "N");
         
         //테스트 코드
