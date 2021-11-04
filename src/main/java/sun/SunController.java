@@ -4,12 +4,17 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 import javax.xml.parsers.*;
+
+import dem.DemInfo;
 import org.w3c.dom.*;
 import org.xml.sax.SAXException;
 
-public class SunApiController {
+public class SunController {
+
+    ArrayList<ArrayList<SunInfo>> si = new ArrayList<ArrayList<SunInfo>>();
+
     //api 호출 함수 (String 형태의 xml 반환)
-    public SunInfo getSunInfoXml(String locdate, String latitude, String longitude, String dnYn) throws IOException, ParserConfigurationException, SAXException {
+    public void setSunInfo(String locdate, String latitude, String longitude, String dnYn) throws IOException, ParserConfigurationException, SAXException {
 
         final String serviceKey = "mfnlHHjaj4zfqSUXTbi%2FoYlQEkYX%2Bk3COHTUxCBNqBKPeIQw7GbQNNUp6H5bLRkAOgZrhXQXeVHLf1PPTQfT3Q%3D%3D";
 
@@ -46,12 +51,18 @@ public class SunApiController {
 
         xml = resultLine.toString();
 
-        SunInfo si = getSunInfo(xml);
-
-        return si;
+        for(int i=0; i<253; i++){
+            ArrayList<SunInfo> sunInfos = new ArrayList<>();
+            for(int j=0; j<314; j++){
+                sunInfos.add(makeSunInfo(xml));
+            }
+            si.add(sunInfos);
+        }
     }
 
-    private SunInfo getSunInfo(String xml) throws ParserConfigurationException, IOException, SAXException {
+    public ArrayList<ArrayList<SunInfo>> getSunInfo() {return si;}
+
+    private SunInfo makeSunInfo(String xml) throws ParserConfigurationException, IOException, SAXException {
         // xml을 파싱해주는 객체를 생성
         DocumentBuilderFactory factory = DocumentBuilderFactory
                 .newInstance();
@@ -91,10 +102,7 @@ public class SunApiController {
     private String degreeToStr(String deg){
         String ret = "";
         for(int i=0; i<deg.length(); i++){
-            if(i == 0 && deg.charAt(0) == '-') {
-                ret += '-';
-                continue;
-            }
+            if(i == 0 && deg.charAt(0) == '-') ret += '-';
             else if('0' <= deg.charAt(i) && deg.charAt(i) <= '9') ret += deg.charAt(i);
             else if(deg.charAt(i) == '˚') ret += '.';
         }
