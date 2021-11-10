@@ -3,9 +3,18 @@ package shp;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
+import org.opengis.geometry.DirectPosition;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 
 import java.util.List;
 
@@ -22,18 +31,53 @@ public class ShpMapper {
         collection = shp.getCollection();
     }
 
+    public Point makePointGeometry(double longitude, double latitude) throws Exception {
+        // reference : http://www.gisdeveloper.co.kr/?p=8942
+        // X 좌표가 먼저 오도록 설정. 즉, longitude 먼저 나온다.
+        System.setProperty("org.geotools.referencing.forceXY", "true");
+        CoordinateReferenceSystem sourceCrs = CRS.decode("EPSG:4326");
+        CoordinateReferenceSystem targetCrs = CRS.decode("EPSG:5179");
+        MathTransform engine = CRS.findMathTransform(sourceCrs, targetCrs, true);
+
+        DirectPosition2D source;
+        if (CRS.getAxisOrder(sourceCrs).equals(org.geotools.referencing.CRS.AxisOrder.EAST_NORTH)) {
+            source = new DirectPosition2D(sourceCrs, longitude, latitude);
+        } else {
+            source = new DirectPosition2D(sourceCrs, latitude, longitude);
+        }
+        DirectPosition target = new DirectPosition2D(targetCrs);
+        engine.transform(source, target);
+        GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
+        Coordinate coord = new Coordinate(target.getCoordinate()[0], target.getCoordinate()[1]);
+        //Coordinate coord = new Coordinate(1115098.00518875, 1964782.4199882038);
+        return geometryFactory.createPoint(coord);
+    }
+
     // 맨 위 하나만 출력
-    public void printAttributes() {
+    public void printAttributes(double longitude, double latitude) throws Exception {
         // attribute 추출
         List<AttributeDescriptor> Attributes = source.getSchema().getAttributeDescriptors();
         int attributeCount = source.getSchema().getAttributeCount();
 
+        if(longitude < 1) {
+            longitude = 126.966666;
+            latitude = 37.55;
+        }
+        Point point = makePointGeometry(longitude, latitude);
+        System.out.println("x = " + point.getX() + ", " + "y = " + point.getY());
+
         try (FeatureIterator<SimpleFeature> features = collection.features()) {
-            SimpleFeature feature = features.next();
-            // tuple 추출
-            List<Object> values = feature.getAttributes();
-            for (int i = 0; i < attributeCount; i++) {
-                System.out.println(Attributes.get(i).getLocalName() + " : " + values.get(i));
+            while(features.hasNext()) {
+                SimpleFeature feature = features.next();
+                List<Object> values = feature.getAttributes();
+                // tuple 추출
+                MultiPolygon multiPolygon = (MultiPolygon) feature.getDefaultGeometryProperty().getValue();
+                //System.out.println(multiPolygon.getCentroid().getX() + ", " + multiPolygon.getCentroid().getY());
+                if(point.contains(multiPolygon)) {
+                    for (int i = 0; i < attributeCount; i++) {
+                        System.out.println(Attributes.get(i).getLocalName() + " : " + values.get(i));
+                    }
+                }
             }
         }
     }
