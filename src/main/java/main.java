@@ -1,10 +1,8 @@
+import Algorithms.HillshadeAlgorithm;
 import config.ApplicationProperties;
 import crawling.Crawler;
-import dem.DemController;
 import dem.DemInfo;
 import dem.DemService;
-import macro.MousePointerTest;
-import macro.Selenium;
 import org.xml.sax.SAXException;
 import sun.SunService;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,5 +32,9 @@ public class main {
         dem.run();
         Crawler crawler = new Crawler();
         crawler.run();
+
+        HillshadeAlgorithm hs = new HillshadeAlgorithm();
+        ArrayList<ArrayList<Double>> hsArr = hs.hsConverter(sun.get(), dem.getDEM());
+        System.out.println(hsArr.toString()); // 테스트 코드
     }
 }

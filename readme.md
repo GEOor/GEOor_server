@@ -2,13 +2,13 @@
 
 ## 서비스 설명
 
-- Algorithms.Hillshade 알고리즘과 팀원들이 특수 제작한 알고리즘을 결합해 특정 도로의 Black ice 발생을 예측해주는 서비스입니다.
+- Algorithms.HillshadeAlgorithm 알고리즘과 팀원들이 특수 제작한 알고리즘을 결합해 특정 도로의 Black ice 발생을 예측해주는 서비스입니다.
 
 
-## 1. Algorithms.Hillshade Algorithm
+## 1. Algorithms.HillshadeAlgorithm Algorithm
 [공식 참조](https://pro.arcgis.com/en/pro-app/latest/tool-reference/3d-analyst/how-hillshade-works.htm)
 
-- 널리쓰이고있는 Algorithms.Hillshade(음영기복도) 알고리즘입니다.<br>
+- 널리쓰이고있는 Algorithms.HillshadeAlgorithm(음영기복도) 알고리즘입니다.<br>
 
 ### 대략적인 구성
 <br><img src="img/readme_hillshade.png?raw=true"/><br>
