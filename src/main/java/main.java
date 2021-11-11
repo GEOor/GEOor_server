@@ -3,10 +3,8 @@ import config.ApplicationProperties;
 import crawling.Crawler;
 import dem.DemInfo;
 import dem.DemService;
-import org.xml.sax.SAXException;
+import shp.ShpMain;
 import sun.SunService;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class main {
@@ -17,9 +15,9 @@ public class main {
     private static DemService dem = new DemService();
     private static SunService sun = new SunService();
 
-    public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException {
-        //ShpMain shpMain = new ShpMain();
-        //shpMain.run();
+    public static void main(String[] args) throws Exception {
+//        ShpMain shpMain = new ShpMain();
+//        shpMain.run();
 
         dem.run();
 
