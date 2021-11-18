@@ -24,7 +24,7 @@ public class Crawler {
 		
 		try {
 			// drvier 설정 - resource에 넣어놓음
-			System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver");
+			System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
 			// Chrome 드라이버 인스턴스 설정
 			driver = new ChromeDriver();
 			
@@ -36,7 +36,6 @@ public class Crawler {
 			List<WebElement> tr = ((ChromeDriver) driver).findElementsByXPath("//*[@id=\"sun-height-table\"]/table/tbody/tr");
 			
 			// 출력
-			System.out.println(tr.size());
 			for(int i = 0; i<tr.size(); i++) System.out.println(tr.get(i).getText());
 			
 			
