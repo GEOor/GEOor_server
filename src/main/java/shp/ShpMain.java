@@ -6,7 +6,11 @@ public class ShpMain {
 
     public void run() throws Exception {
         Shp shp = new Shp(getProperty("shp.fileName"));
-        ShpMapper shpMapper = new ShpMapper(shp);
-        shpMapper.printAttributes(0, 0);
+        //ShpConvert shpConvert = new ShpConvert(shp);
+        //shpConvert.printAttributes(0, 0);
+        //ShpMap shpMap = new ShpMap(shp);
+        //shpMap.createMap();
+        TestDraw testDraw = new TestDraw(shp.getFile());
+        testDraw.displayShapefile();
     }
 }

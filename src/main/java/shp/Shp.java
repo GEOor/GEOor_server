@@ -75,4 +75,8 @@ public class Shp {
         }
         return null;
     }
+
+    public File getFile() {
+        return file;
+    }
 }

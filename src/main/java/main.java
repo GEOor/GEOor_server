@@ -16,23 +16,23 @@ public class main {
     private static SunService sun = new SunService();
 
     public static void main(String[] args) throws Exception {
-//        ShpMain shpMain = new ShpMain();
-//        shpMain.run();
+        ShpMain shpMain = new ShpMain();
+        shpMain.run();
 
-        dem.run();
-
-        ArrayList<ArrayList<DemInfo>> arr = dem.getDEM();
-        System.out.println(arr.get(0).get(1).getX()); // 테스트 코드
-        sun.run();
-        sun.set();
-        sun.get();
-        sun.test1();
-        dem.run();
-        Crawler crawler = new Crawler();
-        crawler.run();
-
-        HillshadeAlgorithm hs = new HillshadeAlgorithm();
-        ArrayList<ArrayList<Double>> hsArr = hs.hsConverter(sun.get(), dem.getDEM());
-        System.out.println(hsArr.toString()); // 테스트 코드
+//        dem.run();
+//
+//        ArrayList<ArrayList<DemInfo>> arr = dem.getDEM();
+//        System.out.println(arr.get(0).get(1).getX()); // 테스트 코드
+//        sun.run();
+//        sun.set();
+//        sun.get();
+//        sun.test1();
+//        dem.run();
+//        Crawler crawler = new Crawler();
+//        crawler.run();
+//
+//        HillshadeAlgorithm hs = new HillshadeAlgorithm();
+//        ArrayList<ArrayList<Double>> hsArr = hs.hsConverter(sun.get(), dem.getDEM());
+//        System.out.println(hsArr.toString()); // 테스트 코드
     }
 }

@@ -19,12 +19,12 @@ import java.util.List;
 /**
  * 출력역할만 함
  */
-public class ShpMapper {
+public class ShpConvert {
 
     private FeatureSource<SimpleFeatureType, SimpleFeature> source;
     private FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
 
-    public ShpMapper(Shp shp) {
+    public ShpConvert(Shp shp) {
         source = shp.getSource();
         collection = shp.getCollection();
     }
