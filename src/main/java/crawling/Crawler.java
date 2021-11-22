@@ -5,6 +5,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import sun.SunInfo;
 
 import java.util.ArrayList;
@@ -28,7 +29,11 @@ public class Crawler {
 			// drvier 설정 - resource에 넣어놓음
 			System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver");
 			// Chrome 드라이버 인스턴스 설정
-			driver = new ChromeDriver();
+			// Chrome 드라이버 인스턴스 설정
+			ChromeOptions chromeOptions = new ChromeOptions();
+			chromeOptions.addArguments("--headless");
+			chromeOptions.addArguments("--no-sandbox");
+			driver = new ChromeDriver(chromeOptions);
 			
 			// URL로 접속 (이때 address는 중요하지 않다. 위,경도 좌표만 제대로 입력하면 고도각이 출력된다)
 			driver.get(url+"?useElevation=1&lat="+lat.toString()+"&lng="+lng.toString()+"&elevation=0&output_range=1&date="+date+"&hour=&minute=&second=&address="+address);
