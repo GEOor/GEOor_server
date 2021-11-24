@@ -9,8 +9,10 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import sun.SunInfo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class Crawler {
 	
@@ -19,7 +21,7 @@ public class Crawler {
 //	private String lat = "37.69134601495178";
 //	private String lng = "128.75902562744776";
 	private String date = "2021-11-04";
-	private ArrayList<SunInfo> si;
+	private ArrayList<SunInfo> si = new ArrayList<>();
 	
 	public void run(Double lat, Double lng){
 		WebDriver driver = null;
@@ -27,7 +29,7 @@ public class Crawler {
 		
 		try {
 			// drvier 설정 - resource에 넣어놓음
-			System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver");
+			System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
 			// Chrome 드라이버 인스턴스 설정
 			// Chrome 드라이버 인스턴스 설정
 			ChromeOptions chromeOptions = new ChromeOptions();
@@ -43,37 +45,9 @@ public class Crawler {
 			List<WebElement> tr = ((ChromeDriver) driver).findElementsByXPath("//*[@id=\"sun-height-table\"]/table/tbody/tr");
 			
 			// 출력
-			for(int i = 0; i<tr.size(); i++) System.out.println(tr.get(i).getText());
-
-			/*
-				2021-11-22
-				작성자 : 천수환
-				내용 : text 메시지 -> SunInfo에 맞는 변수들로 변환 후 ArrayList 삽입
-				목적 : 크롤러 정보 get 함수로 깔끔하게 보내기 위함
-			 */
-			for(int i=0; i<tr.size(); i++){
-				String s = tr.get(i).getText();
-				Double parce = 0.0;
-				int cnt = 0;
-
-				for(int j=0; j<s.length(); j++){
-					if(s.charAt(j) == ' ') {
-						cnt++;
-						continue;
-					}
-
-					else if(cnt == 0) continue;
-
-					else if(cnt == 1){
-						if(s.charAt(j) == '-')
-						parce *= 10;
-						parce += s.charAt(j) - '0';
-					}
-
-				}
-			}
-
+			// for(int i = 0; i<tr.size(); i++) System.out.println(tr.get(i).getText());
 			
+			crawlerParsing(tr);
 			
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -82,6 +56,35 @@ public class Crawler {
 		}
 	}
 
+	/**
+	 	2021-11-24
+		작성자 : 김태현
+		내용 : 태양 고도각 관련 정보 크롤링 결과 파싱
+		목적 : 크롤러 정보 get 함수로 깔끔하게 보내기 위함
+	*/
+	
+	private void crawlerParsing(List<WebElement> arr){
+		for(int i = 0; i < arr.size(); i++){
+			List<String> strings = Arrays.asList(arr.get(i).getText().split(" "));
+			SunInfo s = new SunInfo(0,0D,0D,0D,0D);
+			s.setTime(i);
+			for(int k = 1; k <= 12; k += 3){
+				Double degree = Double.parseDouble(strings.get(k));
+				Double minute = Double.parseDouble(strings.get(k+1));
+				Double second = Double.parseDouble(strings.get(k+2));
+				// 적경은 단위가 시분초임 -> 초단위로 바꾸기
+				Double t = degree*3600 + minute*60 + second;
+				// 도분초 -> degree로 변환 : 소수자리 = (분/60)+(초/3600)
+				degree += (minute/60) + (second/3600);
+				if(k == 1) s.setAzimuth(degree);
+				else if (k == 4) s.setAltitude(degree);
+				else if (k == 7) s.setAscension(t);
+				else s.setDeclination(degree);
+			}
+			si.add(s);
+		}
+	}
+	
 	public ArrayList<SunInfo> get(){
 		return si;
 	}
