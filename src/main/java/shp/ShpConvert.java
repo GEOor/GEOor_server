@@ -36,8 +36,8 @@ public class ShpConvert {
         int attributeCount = source.getSchema().getAttributeCount();
         // 테스팅 좌표
         if(longitude < 1) {
-            longitude = 126.966666;
-            latitude = 37.55;
+            longitude = 129.79064984;
+            latitude = 37.75240046576439;
         }
         Point point = makePointGeometry(longitude, latitude);
         System.out.println("x = " + point.getX() + ", " + "y = " + point.getY());

@@ -108,16 +108,18 @@ public class TestDraw {
          * we can just create our tool as an anonymous sub-class
          * of CursorTool.
          */
-        btn.addActionListener(
-                e ->
-                        mapFrame.getMapPane()
-                                .setCursorTool(
-                                        new CursorTool() {
-                                            @Override
-                                            public void onMouseClicked(MapMouseEvent ev) {
-                                                selectFeatures(ev);
-                                            }
-                                        }));
+        /**
+         * 여기서 마우스 이벤트가 일어나면 해당 polygon은 색칠되고 콘솔에 정보가 찍힌다.
+         * 이걸 이용하면 처음부터 어떤 polygon에 다른 색을 입힐 수 있지 않을까?
+         */
+        btn.addActionListener( e -> mapFrame.getMapPane()
+                .setCursorTool(new CursorTool() {
+                    @Override
+                    public void onMouseClicked(MapMouseEvent ev) {
+                        selectFeatures(ev);
+                    }
+                })
+        );
 
         /** Finally, we display the map frame. When it is closed this application will exit. */
         mapFrame.setSize(600, 600);
@@ -162,8 +164,8 @@ public class TestDraw {
                 while (iter.hasNext()) {
                     SimpleFeature feature = iter.next();
                     IDs.add(feature.getIdentifier());
-
-                    System.out.println("   " + feature.getIdentifier());
+                    System.out.println(feature.getIdentifier());
+                    System.out.println("Shape_Leng : " + feature.getAttribute("Shape_Leng"));
                 }
             }
 
