@@ -2,145 +2,117 @@ package sun;
 
 public class SunInfo {
 
-    //날짜
-    String locdate;
-    //지역
-    String location;
-    //경도
-    Double longitude;
-    //경도(10진수)
-    Double longitudeNum;
-    //위도
-    Double latitude;
-    //위도(10진수)
-    Double latitudeNum;
-    //9시 방위각
-    Double azimuth_09;
-    //9시 고도
-    Double altitude_09;
-    //12시 방위각
-    Double azimuth_12;
-    //12시 고도
-    Double altitude_12;
-    //15시 방위각
-    Double azimuth_15;
-    //15시 고도
-    Double altitude_15;
-    //18시 방위각
-    Double azimuth_18;
-    //18시 고도
-    Double altitude_18;
-    //남중 고도
-    Double altitudeMeridian;
+    //x, y좌표
+    private int x, y;
+    //위도, 경도
+    private Double latitude, longitude;
+    //시각
+    private Integer time;
+    //방위각
+    private Double azimuth;
+    //고도
+    private Double altitude;
+    //적경
+    private Double ascension;
+    //적위
+    private Double declination;
 
-    /* 고정 변수 */
-    //페이지당 항목수
-    Integer numOfRows = 10;
-    //페이지
-    Integer pageNo = 1;
-
-    @Override
-    public String toString() {
-        return "SunInfo{" +
-                "locdate='" + locdate + '\'' +
-                ", location='" + location + '\'' +
-                ", longitude=" + longitude +
-                ", longitudeNum=" + longitudeNum +
-                ", latitude=" + latitude +
-                ", latitudeNum=" + latitudeNum +
-                ", azimuth_09=" + azimuth_09 +
-                ", altitude_09=" + altitude_09 +
-                ", azimuth_12=" + azimuth_12 +
-                ", altitude_12=" + altitude_12 +
-                ", azimuth_15=" + azimuth_15 +
-                ", altitude_15=" + altitude_15 +
-                ", azimuth_18=" + azimuth_18 +
-                ", altitude_18=" + altitude_18 +
-                ", altitudeMeridian=" + altitudeMeridian +
-                ", numOfRows=" + numOfRows +
-                ", pageNo=" + pageNo +
-                '}';
-    }
-
-    /* Constructor */
-
-    public SunInfo(String locdate, String location, Double longitude, Double longitudeNum, Double latitude, Double latitudeNum, Double azimuth_09, Double altitude_09, Double azimuth_12, Double altitude_12, Double azimuth_15, Double altitude_15, Double azimuth_18, Double altitude_18, Double altitudeMeridian) {
-        this.locdate = locdate;
-        this.location = location;
-        this.longitude = longitude;
-        this.longitudeNum = longitudeNum;
+    public SunInfo(int x, int y, Double latitude, Double longitude, Integer time, Double azimuth, Double altitude, Double ascension, Double declination) {
+        this.x = x;
+        this.y = y;
         this.latitude = latitude;
-        this.latitudeNum = latitudeNum;
-        this.azimuth_09 = azimuth_09;
-        this.altitude_09 = altitude_09;
-        this.azimuth_12 = azimuth_12;
-        this.altitude_12 = altitude_12;
-        this.azimuth_15 = azimuth_15;
-        this.altitude_15 = altitude_15;
-        this.azimuth_18 = azimuth_18;
-        this.altitude_18 = altitude_18;
-        this.altitudeMeridian = altitudeMeridian;
+        this.longitude = longitude;
+        this.time = time;
+        this.azimuth = azimuth;
+        this.altitude = altitude;
+        this.ascension = ascension;
+        this.declination = declination;
     }
 
-    /* Getter */
-
-    public String getLocdate() {
-        return locdate;
+    public int getX() {
+        return x;
     }
 
-    public String getLocation() {
-        return location;
+    public void setX(int x) {
+        this.x = x;
     }
 
-    public Double getLongitude() {
-        return longitude;
+    public int getY() {
+        return y;
     }
 
-    public Double getLongitudeNum() {
-        return longitudeNum;
+    public void setY(int y) {
+        this.y = y;
     }
 
     public Double getLatitude() {
         return latitude;
     }
 
-    public Double getLatitudeNum() {
-        return latitudeNum;
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
     }
 
-    public Double getAzimuth_09() {
-        return azimuth_09;
+    public Double getLongitude() {
+        return longitude;
     }
 
-    public Double getAltitude_09() {
-        return altitude_09;
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
     }
 
-    public Double getAzimuth_12() {
-        return azimuth_12;
+    public Integer getTime() {
+        return time;
     }
 
-    public Double getAltitude_12() {
-        return altitude_12;
+    public void setTime(Integer time) {
+        this.time = time;
     }
 
-    public Double getAzimuth_15() {
-        return azimuth_15;
+    public Double getAzimuth() {
+        return azimuth;
     }
 
-    public Double getAltitude_15() {
-        return altitude_15;
+    public void setAzimuth(Double azimuth) {
+        this.azimuth = azimuth;
     }
 
-    public Double getAzimuth_18() {
-        return azimuth_18;
+    public Double getAltitude() {
+        return altitude;
     }
 
-    public Double getAltitude_18() {
-        return altitude_18;
+    public void setAltitude(Double altitude) {
+        this.altitude = altitude;
     }
 
-    public Double getAltitudeMeridian() {
-        return altitudeMeridian;
+    public Double getAscension() {
+        return ascension;
+    }
+
+    public void setAscension(Double ascension) {
+        this.ascension = ascension;
+    }
+
+    public Double getDeclination() {
+        return declination;
+    }
+
+    public void setDeclination(Double declination) {
+        this.declination = declination;
+    }
+
+    @Override
+    public String toString() {
+        return "SunInfo{" +
+                "x=" + x +
+                ", y=" + y +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", time=" + time +
+                ", azimuth=" + azimuth +
+                ", altitude=" + altitude +
+                ", ascension=" + ascension +
+                ", declination=" + declination +
+                '}';
     }
 }

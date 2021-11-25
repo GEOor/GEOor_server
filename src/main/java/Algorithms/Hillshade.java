@@ -2,24 +2,21 @@ package Algorithms;
 
 public class Hillshade {
 
-    //hillshade 값
-    private Double hillshade;
-
     //x,y 좌표 값
     private int x;
     private int y;
 
-    public Hillshade(Double hillshade, int x, int y) {
-        this.hillshade = hillshade;
+    //위도, 경도
+    private Double latitude, longitude;
+
+    //hillshade 값
+    private Double hillshade;
+
+    public Hillshade(int x, int y, Double latitude, Double longitude, Double hillshade) {
         this.x = x;
         this.y = y;
-    }
-
-    public Double getHillshade() {
-        return hillshade;
-    }
-
-    public void setHillshade(Double hillshade) {
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.hillshade = hillshade;
     }
 
@@ -37,5 +34,40 @@ public class Hillshade {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+
+    public Double getHillshade() {
+        return hillshade;
+    }
+
+    public void setHillshade(Double hillshade) {
+        this.hillshade = hillshade;
+    }
+
+    @Override
+    public String toString() {
+        return "Hillshade{" +
+                "x=" + x +
+                ", y=" + y +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", hillshade=" + hillshade +
+                '}';
     }
 }

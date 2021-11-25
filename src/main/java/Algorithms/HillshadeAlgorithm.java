@@ -6,23 +6,32 @@ import sun.SunInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/*
- * convert (sunInfo + dem) -> hillshade
- * */
+/**
+ 2021-11-5
+ 작성자 : 천수환
+ 내용 : Hillshade Algorithm 구현, 태양고도각(si), dem값(di) 2차원 ArrayList를 이용해 똑같은 크기의 Hillshade(음영기복도) 2차원 ArrayList 로 변환
+ 작동 원리
+ 1) i, j가 모두 0이 아닌 점에서, 해당 점을 가운데로하는 3 by 3 정사각형을 만든다.
+ 2) 이미 구한 태양고도각 정보들과, 주변 dem 값들을 이용해 공식에 대입
+ 3) Hillshade ArrayList에 저장
+ */
 public class HillshadeAlgorithm {
-    public ArrayList<ArrayList<Double>> hsConverter(ArrayList<ArrayList<SunInfo>> si, ArrayList<ArrayList<DemInfo>> di){
-        ArrayList<ArrayList<Double>> hs = new ArrayList<ArrayList<Double>>();
+    public ArrayList<ArrayList<Hillshade>> hsConverter(ArrayList<ArrayList<SunInfo>> si, ArrayList<ArrayList<DemInfo>> di){
+        ArrayList<ArrayList<Hillshade>> hs = new ArrayList<ArrayList<Hillshade>>();
         //맨 위, 아래 행에 빈 arraylist 하나씩 추가해주기 (배열 크기 맞추기 위함)
-        ArrayList<Double> tmp = new ArrayList<Double>(si.get(0).size());
+        ArrayList<Hillshade> tmp = new ArrayList<Hillshade>(si.get(0).size());
         hs.add(tmp);
+
         for(int i=1; i<si.size() - 1; i++){
-            ArrayList<Double> row = new ArrayList<Double>(si.get(i).size());
-            row.add(0.0);
+            ArrayList<Hillshade> row = new ArrayList<Hillshade>(si.get(i).size());
+            Hillshade row_hs = new Hillshade(0, 0, 0D, 0D, 0D);
+            row.add(row_hs);
             for(int j=1; j<si.get(i).size() - 1; j++){
+
                 /*
                 3x3 window
                 (a, b, c)
-                (d, e, f) ---> e = which the aspect is being calculated
+                (d, e, f) ---> e = (i, j) 좌표의 음영기복도
                 (g, h, i)
                  */
                 HashMap<Character, Double>windows = new HashMap<Character, Double>();
@@ -35,13 +44,13 @@ public class HillshadeAlgorithm {
                 }
 
                 // (2) Zenith_deg = 90 - Altitude
-                Double Zenith_deg = 90 - si.get(i).get(j).getAltitude_09();
+                Double Zenith_deg = 90 - si.get(i).get(j).getAltitude();
 
                 // (3) Zenith_rad = Zenith * pi / 180.0
                 Double Zenith_rad = (Zenith_deg * Math.PI) / 180.0;
 
                 // (4) Azimuth_math = 360.0 - Azimuth + 90
-                Double Azimuth_math = 360.0 - si.get(i).get(j).getAzimuth_09();
+                Double Azimuth_math = 360.0 - si.get(i).get(j).getAzimuth();
 
                 // (5) if Azimuth_math >= 360.0, then: Azimuth_math = Azimuth_math - 360.0
                 if(Azimuth_math >= 360.0) Azimuth_math = Azimuth_math - 360.0;
@@ -83,13 +92,17 @@ public class HillshadeAlgorithm {
                 Double hs_cell = 255.0 * ((Math.cos(Zenith_rad) * Math.cos(Slope_rad)) + (Math.sin(Zenith_rad) * Math.sin(Slope_rad)
                         * Math.cos(Azimuth_rad - Aspect_rad)));
 
-                row.add(hs_cell);
+                Hillshade hs_xy = new Hillshade(si.get(i).get(j).getX(), si.get(i).get(j).getY(),
+                        si.get(i).get(j).getLatitude(), si.get(i).get(j).getLongitude(), hs_cell);
+
+                row.add(hs_xy);
             }
-            row.add(0.0);
+            row_hs = new Hillshade(0, 0, 0D, 0D, 0D);
+            row.add(row_hs);
+
             hs.add(row);
         }
         //맨 위, 아래 행에 빈 arraylist 하나씩 추가해주기 (배열 크기 맞추기 위함)
-        ArrayList<Double> tmp2 = new ArrayList<Double>(si.get(0).size());
         hs.add(tmp);
         return hs;
     }
