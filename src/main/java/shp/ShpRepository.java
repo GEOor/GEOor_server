@@ -25,23 +25,21 @@ import static config.ApplicationProperties.getProperty;
 public class ShpRepository {
 
     private final Shp shp;
-    private final String tableName = "geor";
     private HashMap<String, String> dbParam = new HashMap<>();
 
     public ShpRepository(Shp shp) throws IOException {
         this.shp = shp;
+        dbParam.put(PostgisNGDataStoreFactory.DBTYPE.key, getProperty("db.type"));
+        dbParam.put(PostgisNGDataStoreFactory.HOST.key, getProperty("db.host"));
+        dbParam.put(PostgisNGDataStoreFactory.PORT.key, getProperty("db.port"));
+        dbParam.put(PostgisNGDataStoreFactory.SCHEMA.key, getProperty("db.schema"));
+        dbParam.put(PostgisNGDataStoreFactory.DATABASE.key, getProperty("db.database"));
+        dbParam.put(PostgisNGDataStoreFactory.USER.key, getProperty("db.user"));
+        dbParam.put(PostgisNGDataStoreFactory.PASSWD.key, "1");
     }
 
+    // https://stackoverflow.com/questions/54545780/shape-file-or-geojson-to-database/54556180#54556180
     public void save() throws IOException {
-        Map<String, Object> outParams = new HashMap<>();
-        outParams.put(PostgisNGDataStoreFactory.DBTYPE.key, PostgisNGDataStoreFactory.DBTYPE.sample);
-        outParams.put(PostgisNGDataStoreFactory.USER.key, "postgres");
-        outParams.put(PostgisNGDataStoreFactory.PASSWD.key, "1");
-        outParams.put(PostgisNGDataStoreFactory.HOST.key, "localhost");
-        outParams.put(PostgisNGDataStoreFactory.PORT.key, 5432);
-        outParams.put(PostgisNGDataStoreFactory.DATABASE.key, "geor");
-        outParams.put(PostgisNGDataStoreFactory.SCHEMA.key, "public");
-
         // Read
         DataStore inputDataStore = DataStoreFinder.getDataStore(
                 Collections.singletonMap("url", URLs.fileToUrl(shp.getFile())));
@@ -55,7 +53,7 @@ public class ShpRepository {
         FeatureCollection<SimpleFeatureType, SimpleFeature>
                 inputFeatureCollection = source.getFeatures();
 
-        DataStore newDataStore = DataStoreFinder.getDataStore(outParams);
+        DataStore newDataStore = DataStoreFinder.getDataStore(dbParam);
 
 
         String typeName = inputTypeName;
