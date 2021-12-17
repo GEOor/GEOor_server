@@ -19,12 +19,12 @@ import java.util.List;
 /**
  * 출력역할만 함
  */
-public class ShpConvert {
+public class ShpMapper {
 
     private FeatureSource<SimpleFeatureType, SimpleFeature> source;
     private FeatureCollection<SimpleFeatureType, SimpleFeature> collection;
 
-    public ShpConvert(Shp shp) {
+    public ShpMapper(Shp shp) {
         source = shp.getSource();
         collection = shp.getCollection();
     }
@@ -36,8 +36,8 @@ public class ShpConvert {
         int attributeCount = source.getSchema().getAttributeCount();
         // 테스팅 좌표
         if(longitude < 1) {
-            longitude = 129.79064984;
-            latitude = 37.75240046576439;
+            longitude = 126.966666;
+            latitude = 37.55;
         }
         Point point = makePointGeometry(longitude, latitude);
         System.out.println("x = " + point.getX() + ", " + "y = " + point.getY());
