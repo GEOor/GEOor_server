@@ -22,7 +22,6 @@ public class Shp {
 
     private final File file;
     private final Map<String, Object> map = new HashMap<>();
-    private DataStore dataStore;
     private FeatureSource<SimpleFeatureType, SimpleFeature> source;
 
     public Shp(String fileName) {
@@ -37,8 +36,7 @@ public class Shp {
             map.put("url", file.toURI().toURL());
             // 한글 깨짐 방지
             map.put("charset", "EUC-KR");
-            DataStore shapeDataStore = DataStoreFinder.getDataStore(map);
-        } catch (Exception e) {
+        } catch (MalformedURLException e) {
             e.printStackTrace();
         }
     }
@@ -47,9 +45,12 @@ public class Shp {
      * 세부 조정할 일 아니면 이해할 필요는 없다.
      */
     private void setSource() {
+        DataStore dataStore = null;
         try {
             dataStore = DataStoreFinder.getDataStore(map);
             String typeName = dataStore.getTypeNames()[0];
+
+
             source = dataStore.getFeatureSource(typeName);
         } catch (IOException e) {
             e.printStackTrace();
@@ -73,10 +74,6 @@ public class Shp {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public DataStore getDataStore() {
-        return dataStore;
     }
 
     public File getFile() {
