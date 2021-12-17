@@ -4,6 +4,7 @@ import Algorithms.TransformCoordinate;
 import config.ApplicationProperties;
 import dem.DemInfo;
 import dem.DemService;
+import shp.ShpService;
 import sun.SunService;
 import java.util.ArrayList;
 
@@ -14,9 +15,12 @@ public class main {
 
     private static DemService dem = new DemService();
     private static SunService sun = new SunService();
+    private static ShpService shpService = new ShpService();
     private static TransformCoordinate tf;
 
     public static void main(String[] args){
+
+        shpService.run();
 
         /**
             dem api 호출 부분
