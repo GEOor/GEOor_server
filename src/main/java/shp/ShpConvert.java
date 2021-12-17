@@ -36,8 +36,8 @@ public class ShpConvert {
         int attributeCount = source.getSchema().getAttributeCount();
         // 테스팅 좌표
         if(longitude < 1) {
-            longitude = 129.79064984;
-            latitude = 37.75240046576439;
+            longitude = 128.8051894118771;
+            latitude = 37.675356288096886;
         }
         Point point = makePointGeometry(longitude, latitude);
         System.out.println("x = " + point.getX() + ", " + "y = " + point.getY());
@@ -49,7 +49,7 @@ public class ShpConvert {
                 // tuple 추출
                 MultiPolygon multiPolygon = (MultiPolygon) feature.getDefaultGeometryProperty().getValue();
                 //System.out.println(multiPolygon.getCentroid().getX() + ", " + multiPolygon.getCentroid().getY());
-                if(point.contains(multiPolygon)) {
+                if(feature.getBounds().contains(point.getX(), point.getY())) {
                     for (int i = 0; i < attributeCount; i++) {
                         System.out.println(Attributes.get(i).getLocalName() + " : " + values.get(i));
                     }
@@ -72,7 +72,6 @@ public class ShpConvert {
         engine.transform(source, target);
         GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
         Coordinate coord = new Coordinate(target.getCoordinate()[0], target.getCoordinate()[1]);
-        //Coordinate coord = new Coordinate(1115098.00518875, 1964782.4199882038);
         return geometryFactory.createPoint(coord);
     }
 }
