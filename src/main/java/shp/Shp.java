@@ -14,12 +14,14 @@ import java.util.Map;
 import static config.ApplicationProperties.getProperty;
 
 public class Shp {
+    private File file;
     private DataStore dataStore;
     private FeatureSource<SimpleFeatureType, SimpleFeature> source;
 
     public Shp(String fileName) {
         String pathName = getProperty("shp.directory") + fileName;
-        setDataStore(new File(pathName));
+        file = new File(pathName);
+        setDataStore(file);
         setSource();
     }
 
@@ -47,5 +49,9 @@ public class Shp {
 
     public FeatureSource<SimpleFeatureType, SimpleFeature> getSource() {
         return source;
+    }
+
+    public File getFile() {
+        return file;
     }
 }

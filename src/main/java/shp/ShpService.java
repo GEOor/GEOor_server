@@ -15,9 +15,12 @@ public class ShpService {
     public void run() {
         try {
             ShpRepository shpRepository = new ShpRepository(shp);
-            shpRepository.save();
-            // Point point = convertSRID.convertPoint(29.672782728513347, 137.43395804125578);
-            // shpRepository.find(point);
+            //shpRepository.save();
+            Point point = convertSRID.convertPoint(29.669756415365768, 137.4406806414657);
+            System.out.println(point.toString());
+            shpRepository.find(point);
+//            TestDraw testDraw = new TestDraw(shp.getFile());
+//            testDraw.displayShapefile();
         } catch(Exception e) {
 
         }

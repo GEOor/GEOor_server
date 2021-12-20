@@ -3,13 +3,11 @@ package shp;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.DataUtilities;
-import org.geotools.data.FeatureSource;
 import org.geotools.data.postgis.PostgisNGDataStoreFactory;
 import org.geotools.data.simple.SimpleFeatureCollection;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
-import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.filter.text.cql2.CQL;
 import org.locationtech.jts.geom.Point;
@@ -63,21 +61,6 @@ public class ShpRepository {
         inputDataStore.dispose();
     }
 
-    private List<SimpleFeature> setHillShadeAttribute(DataStore inputDataStore, SimpleFeatureType newSchema, String typeName) {
-        List<SimpleFeature> features = new ArrayList<>();
-        try (SimpleFeatureIterator itr = inputDataStore.getFeatureSource(typeName).getFeatures().features()) {
-            while (itr.hasNext()) {
-                SimpleFeature f = itr.next();
-                SimpleFeature f2 = DataUtilities.reType(newSchema, f);
-                f2.setAttribute("hillshade", 1);
-                features.add(f2);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return features;
-    }
-
     private SimpleFeatureType makeNewSchema(SimpleFeatureType schema) {
         SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
         builder.setName(schema.getName());
@@ -87,11 +70,26 @@ public class ShpRepository {
         return builder.buildFeatureType();
     }
 
+    private List<SimpleFeature> setHillShadeAttribute(DataStore inputDataStore, SimpleFeatureType newSchema, String typeName) {
+        List<SimpleFeature> features = new ArrayList<>();
+        try (SimpleFeatureIterator itr = inputDataStore.getFeatureSource(typeName).getFeatures().features()) {
+            while (itr.hasNext()) {
+                SimpleFeature f = itr.next();
+                SimpleFeature f2 = DataUtilities.reType(newSchema, f);
+                f2.setAttribute("hillshade", 0);
+                features.add(f2);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return features;
+    }
+
     public void find(Point point) {
         String Query = "CONTAINS (the_geom, " + point.toString() + ")";
         try {
             Filter filter = CQL.toFilter(Query);
-            DataStore dataStore = shp.getDataStore();
+            DataStore dataStore = DataStoreFinder.getDataStore(dbParam);
             String typeName = dataStore.getTypeNames()[0];
             SimpleFeatureSource source = dataStore.getFeatureSource(typeName);
             SimpleFeatureCollection result = source.getFeatures(filter);
