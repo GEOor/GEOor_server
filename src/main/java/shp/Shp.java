@@ -3,8 +3,13 @@ package shp;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.Query;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,13 +19,12 @@ import java.util.Map;
 import static config.ApplicationProperties.getProperty;
 
 public class Shp {
-    private File file;
+    private File file; // TestDraw 호출 시 사용
     private DataStore dataStore;
     private FeatureSource<SimpleFeatureType, SimpleFeature> source;
 
-    public Shp(String fileName) {
-        String pathName = getProperty("shp.directory") + fileName;
-        file = new File(pathName);
+    public Shp(String filePath) {
+        file = new File(filePath);
         setDataStore(file);
         setSource();
     }
@@ -43,12 +47,36 @@ public class Shp {
         }
     }
 
+    public void printColumns() throws IOException {
+        SimpleFeatureType schema = source.getSchema();
+        Query query = new Query(schema.getTypeName());
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = source.getFeatures(query);
+        System.out.println(file.getName());
+        try (FeatureIterator<SimpleFeature> features = collection.features()) {
+            SimpleFeature feature = features.next();
+            for (Property attribute : feature.getProperties()) {
+                System.out.println(attribute.getName() + ":" + attribute.getValue());
+            }
+        }
+    }
+
     public DataStore getDataStore() {
         return dataStore;
     }
 
     public FeatureSource<SimpleFeatureType, SimpleFeature> getSource() {
         return source;
+    }
+
+    public FeatureIterator<SimpleFeature> getFeature() {
+        Filter filter = Filter.INCLUDE;
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = null;
+        try {
+            collection = source.getFeatures(filter);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return collection.features();
     }
 
     public File getFile() {

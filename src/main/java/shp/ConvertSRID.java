@@ -36,4 +36,13 @@ public class ConvertSRID {
         Coordinate coord = new Coordinate(target.getCoordinate()[0], target.getCoordinate()[1]);
         return geometryFactory.createPoint(coord);
     }
+
+    public Point revertPoint(double longitude, double latitude) throws TransformException {
+        DirectPosition2D source = new DirectPosition2D(targetCrs, longitude, latitude);
+        DirectPosition target = new DirectPosition2D(sourceCrs);
+        engine.transform(source, target);
+        GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory();
+        Coordinate coord = new Coordinate(target.getCoordinate()[0], target.getCoordinate()[1]);
+        return geometryFactory.createPoint(coord);
+    }
 }
