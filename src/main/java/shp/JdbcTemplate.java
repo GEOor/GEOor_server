@@ -3,12 +3,19 @@ package shp;
 import java.sql.*;
 import java.util.ArrayList;
 
-public class JdbcTemplate {
-    private final String connectUrl = "jdbc:postgresql://localhost:5432/geor";
-    private final String user = "postgres";
-    private final String password = "1";
+import static config.ApplicationProperties.getProperty;
 
-    public JdbcTemplate() {
+public class JdbcTemplate {
+    private final String connectUrl;
+    private final String user;
+    private final String password;
+    private final String tableName;
+
+    public JdbcTemplate(String tableName) {
+        connectUrl = "jdbc:postgresql://localhost:5432/geor";
+        user = getProperty("db.user");
+        password = "1";
+        this.tableName = tableName;
         setClass();
     }
 
@@ -32,56 +39,66 @@ public class JdbcTemplate {
      * @return false : table 있음
      *         true  : table 없음
      */
-    public boolean tableNotExist(Connection conn, String tableName) throws SQLException {
-        try(ResultSet rs = conn.getMetaData().getTables(null, null, tableName, null)) {
-            if (!rs.next()) {
-                System.out.println(tableName + " table이 이 없습니다. table을 생성합니다...");
-                return true;
-            }
+    public boolean tableNotExist(Connection conn) throws SQLException {
+        DatabaseMetaData dbm = conn.getMetaData();
+        ResultSet tables = dbm.getTables(null, null, tableName, null);
+        if(!tables.next()) {
+            System.out.println(tableName + "이 이 없습니다. table을 생성합니다...");
+            return true;
         }
         return false;
     }
 
-    public ArrayList<String> getColumnCount(Connection conn, String tableName) {
+    public ArrayList<String> getColumns(Connection conn) throws SQLException {
         ArrayList<String> columns = new ArrayList<>();
         String Query = "select * from public." + tableName;
-        try(PreparedStatement pstmt = conn.prepareStatement(Query)) {
-            ResultSetMetaData meta = pstmt.getMetaData();
-            for (int i=2; i <= meta.getColumnCount(); i++)
+        try(PreparedStatement pStmt = conn.prepareStatement(Query)) {
+            ResultSetMetaData meta = pStmt.getMetaData();
+            for (int i=1; i <= meta.getColumnCount(); i++)
             {
-                System.out.println("Column name: " + meta.getColumnName(i) + ", data type: " + meta.getColumnTypeName(i));
+                // System.out.println("Column name: " + meta.getColumnName(i) + ", data type: " + meta.getColumnTypeName(i));
                 columns.add(meta.getColumnName(i));
             }
-            System.out.println(columns.size());
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
         return columns;
     }
 
-    public String createPreStatementInsertSQL(String tableName, ArrayList<String> columns) {
-        StringBuilder query = new StringBuilder("insert into public.");
-        query.append(tableName + " values (");
-        for (int i = 0; i < columns.size() - 1; i++) {
-            query.append("?, ");
+    public void createTable(Connection conn) {
+        String createQuery = getCreateQuery();
+        try (Statement st = conn.createStatement()) {
+            st.execute(createQuery);
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        query.append("?);");
-        return query.toString();
     }
 
-    public void test() {
-        try (Connection connection = DriverManager.getConnection(connectUrl, user, password)) {
-            Statement stmt = connection.createStatement();
-            ResultSet rs = stmt.executeQuery("SELECT * from public.test");
-
-            while (rs.next()) {
-                String version = rs.getString("RBID");
-                System.out.println(version);
-            }
-            rs.close();
-            stmt.close();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+    public String getCreateQuery() {
+        return "CREATE TABLE IF NOT EXISTS public.shp\n" +
+                "(\n" +
+                "    the_geom geometry(MultiPolygon,5179),\n" +
+                "    \"RBID\" varchar(15), \n" +
+                "    \"HJCD\" varchar(5), \n" +
+                "    \"UOPS\" integer, \n" +
+                "    \"TPSL\" integer,\n" +
+                "    \"MMSL\" integer,\n" +
+                "    \"FCLT\" integer,\n" +
+                "    \"RDNU\" varchar(30), \n" +
+                "    \"NAME\" varchar(100), \n" +
+                "    \"RDDV\" varchar(6), \n" +
+                "    \"STPT\" varchar(100), \n" +
+                "    \"EDPT\" varchar(100), \n" +
+                "    \"PVQT\" varchar(6), \n" +
+                "    \"DVYN\" varchar(6), \n" +
+                "    \"RDLN\" integer,\n" +
+                "    \"RVWD\" double precision,\n" +
+                "    \"ONSD\" varchar(6), \n" +
+                "    \"RDNM\" varchar(30), \n" +
+                "    \"AREA\" double precision,\n" +
+                "    \"REST\" varchar(50), \n" +
+                "    \"Shape_Leng\" double precision,\n" +
+                "    \"Shape_Area\" double precision,\n" +
+                "    hillshade integer default 0\n" +
+                ")";
     }
 }

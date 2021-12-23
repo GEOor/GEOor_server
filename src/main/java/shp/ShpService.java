@@ -16,7 +16,7 @@ public class ShpService {
 
 
     public ShpService() {
-        jdbcTemplate = new JdbcTemplate();
+        jdbcTemplate = new JdbcTemplate(getProperty("shp.table"));
         shpRepository = new ShpRepository();
         findShpFiles();
     }
@@ -34,22 +34,24 @@ public class ShpService {
         }
     }
 
-    public void run() throws Exception {
-        if(shps.isEmpty())
+    public void run() throws SQLException {
+        // 시작 전 shp 파일들이 있는지 확인
+        if (shps.isEmpty()) {
+            System.out.println("shp 파일이 없습니다. 경로를 확인해주세요.");
             return;
-        Connection conn = jdbcTemplate.getConnection();
-        isTableExist(conn);
-        ArrayList<String> columns = jdbcTemplate.getColumnCount(conn, getProperty("shp.table"));
-        String insertQuery = jdbcTemplate.createPreStatementInsertSQL(getProperty("shp.table"), columns);
-        System.out.println(insertQuery);
-        for (Shp shp : shps) {
-            shpRepository.save(conn, shp, insertQuery, columns);
         }
-    }
-
-    public void isTableExist(Connection conn) throws SQLException {
-        if (jdbcTemplate.tableNotExist(conn, getProperty("shp.table"))) {
-            shpRepository.createShpTable(shps.get(0));
+        // 시작 전 테이블 확인
+        try(Connection conn = jdbcTemplate.getConnection()) {
+            if(jdbcTemplate.tableNotExist(conn)) {
+                jdbcTemplate.createTable(conn);
+            }
+        }
+        // 테이블과 shp 파일 둘 다 확인됐으면 shp 정보 삽입
+        try (Connection conn = jdbcTemplate.getConnection()) {
+            // 테이블에서 column 목록 가져옴
+            ArrayList<String> columns = jdbcTemplate.getColumns(conn);
+            shpRepository.save(conn, shps, columns);
+            conn.commit();
         }
     }
 

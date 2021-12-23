@@ -16,8 +16,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static config.ApplicationProperties.getProperty;
-
 public class Shp {
     private File file; // TestDraw 호출 시 사용
     private DataStore dataStore;
