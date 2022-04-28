@@ -1,14 +1,14 @@
 package shp;
 
-import static config.ApplicationProperties.getProperty;
+
+import config.JdbcTemplate;
 
 public class ShpMain {
 
-    public void run() throws Exception {
-        Shp shp = new Shp(getProperty("shp.fileName"));
-//        ShpConvert shpConvert = new ShpConvert(shp);
-//        shpConvert.printAttributes(0, 0);
-        TestDraw testDraw = new TestDraw(shp.getFile());
-        testDraw.displayShapefile();
+    private static final JdbcTemplate jdbcTemplate = new JdbcTemplate();
+
+    public static void main(String[] args) throws Exception {
+        Table table = new Table("road");
+        table.init(jdbcTemplate.getConnection());
     }
 }

@@ -1,9 +1,11 @@
 package shp;
 
+import java.util.List;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
@@ -11,72 +13,74 @@ import org.opengis.filter.Filter;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static config.ApplicationProperties.getProperty;
+import org.geotools.data.DataStore;
+import org.geotools.data.DataStoreFinder;
+import org.geotools.data.FeatureSource;
+import org.geotools.data.Query;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.Property;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Shp {
-
-    private final File file;
-    private final Map<String, Object> map = new HashMap<>();
+    private File file;
+    // shp 파일을 close 처리 할 때만 사용.
+    private DataStore dataStore;
+    // shp 스키마 까지 보는데 사용
     private FeatureSource<SimpleFeatureType, SimpleFeature> source;
+    // shp 내부 데이터만 보는데 사용
+    private FeatureIterator<SimpleFeature> feature;
 
-    public Shp(String fileName) {
-        String pathName = getProperty("shp.directory") + fileName;
-        this.file = new File(pathName);
-        setMap();
+    public Shp(File file) throws IOException {
+        this.file = file;
+        setDataStore(file);
         setSource();
+        setFeature();
     }
 
-    private void setMap() {
-        try {
-            map.put("url", file.toURI().toURL());
-            // 한글 깨짐 방지
-            map.put("charset", "EUC-KR");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+    private void setDataStore(File file) throws IOException {
+        Map<String, Object> map = new HashMap<>();
+        map.put("url", file.toURI().toURL());
+        map.put("charset", "EUC-KR");
+        dataStore = DataStoreFinder.getDataStore(map);
     }
 
-    /**
-     * 세부 조정할 일 아니면 이해할 필요는 없다.
-     */
-    private void setSource() {
-        DataStore dataStore = null;
-        try {
-            dataStore = DataStoreFinder.getDataStore(map);
-            String typeName = dataStore.getTypeNames()[0];
-
-
-            source = dataStore.getFeatureSource(typeName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(dataStore != null)
-                dataStore.dispose();
-        }
+    private void setSource() throws IOException {
+        source = dataStore.getFeatureSource(dataStore.getTypeNames()[0]);
     }
 
-    public FeatureSource<SimpleFeatureType, SimpleFeature> getSource() {
-        return source;
-    }
-
-    public FeatureCollection<SimpleFeatureType, SimpleFeature> getCollection() {
+    private void setFeature() throws IOException {
         Filter filter = Filter.INCLUDE;
-        FeatureCollection<SimpleFeatureType, SimpleFeature> features;
-        try {
-            features = source.getFeatures(filter);
-            return features;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
+        FeatureCollection<SimpleFeatureType, SimpleFeature> collection = null;
+        collection = source.getFeatures(filter);
+        feature = collection.features();
     }
 
-    public File getFile() {
-        return file;
+    public List<AttributeDescriptor> getAttributeNames() {
+        SimpleFeatureType schema = source.getSchema();
+        return schema.getAttributeDescriptors();
+    }
+
+    public String getName() {
+        return file.getName();
+    }
+
+    public void close() {
+        feature.close();
+        dataStore.dispose();
+    }
+
+    public FeatureIterator<SimpleFeature> getFeature() {
+        return feature;
     }
 }
