@@ -1,5 +1,7 @@
 package shp;
 
+import static config.ApplicationProperties.getProperty;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -12,13 +14,15 @@ import java.sql.Statement;
 public class RunScript {
 
     private final BufferedReader reader;
+    private final String tableName;
 
-    public RunScript(String base, String name) throws FileNotFoundException {
-        File file = new File(base + name);
-        reader = new BufferedReader(new FileReader(file));
+    public RunScript(String tableName) throws FileNotFoundException {
+        File file = new File(getProperty("ddl.base") + getProperty("ddl.road"));
+        this.reader = new BufferedReader(new FileReader(file));
+        this.tableName = tableName;
     }
 
-    public void createSQL(Connection conn) {
+    public void createTable(Connection conn) {
         String query = createQuery();
         try (Statement st = conn.createStatement()) {
             st.execute(query);
@@ -44,8 +48,16 @@ public class RunScript {
     private String readFile() throws IOException {
         StringBuilder query = new StringBuilder();
         String line;
-        while ((line = reader.readLine()) != null)
+        for (int i = 0; (line = reader.readLine()) != null; i++) {
+            // road.sql 첫 줄은 게속 바위어야 해, 값을 따로 넣는다.
+            if (i == 0) {
+                query.append(" CREATE TABLE ");
+                query.append(this.tableName);
+                query.append(" (");
+                continue;
+            }
             query.append(line);
+        }
         return query.toString();
     }
 
