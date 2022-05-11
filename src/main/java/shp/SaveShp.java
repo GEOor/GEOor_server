@@ -12,16 +12,22 @@ import org.opengis.feature.type.AttributeDescriptor;
 
 public class SaveShp {
 
-    private final int batchLimitValue = 1024;
-    private final WKBWriter writer = new WKBWriter();
+    private final int batchLimitValue;
+    private final WKBWriter writer;
 
-    public void save(Connection conn, List<Shp> shpList) {
-        String insertQuery = createQuery();
+    public SaveShp() {
+        this.batchLimitValue = 1024;
+        this.writer = new WKBWriter();
+    }
+
+    public void save(Connection conn, List<Shp> shpList, String tableName) {
+        String insertQuery = createQuery(tableName, shpList.get(0));
         int totalRecordCount = 0;
         try (PreparedStatement pStmt = conn.prepareStatement(insertQuery)) {
             for (Shp shp : shpList) {
-                System.out.printf("%s save start ... ", shp.getName());
+                System.out.printf("%s table %s save start ... ", tableName, shp.getName());
                 totalRecordCount += SetPreparedStatement(pStmt, shp);
+                shp.close();
             }
             conn.commit();
             System.out.printf("total save : %s\n", totalRecordCount);
@@ -55,8 +61,16 @@ public class SaveShp {
         return recordCount;
     }
 
-    private String createQuery() {
-        String query = "INSERT INTO public.road (geom, sig_cd, rw_sn, opert_de) VALUES (?, ?, ?, ?);";
-        return query;
+    private String createQuery(String tableName, Shp shp) {
+        int attributesCount = shp.getAttributeNames().size();
+        StringBuilder query = new StringBuilder();
+        query.append("INSERT INTO public.");
+        query.append(tableName);
+        query.append(" VALUES (");
+        for (int i = 0; i < attributesCount - 1; i++) {
+            query.append("?, ");
+        }
+        query.append("?);");
+        return query.toString();
     }
 }
